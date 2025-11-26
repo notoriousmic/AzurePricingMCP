@@ -85,7 +85,7 @@ python setup.py
 
 ```bash
 # Clone repository
-git clone [https://github.com/msftnadavbh/AzurePricingMCP.git](https://github.com/msftnadavbh/AzurePricingMCP.git)
+git clone https://github.com/msftnadavbh/AzurePricingMCP.git
 cd azure-pricing-mcp
 
 # Create virtual environment
