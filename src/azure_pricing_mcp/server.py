@@ -119,7 +119,8 @@ class AzurePricingServer:
                             response.raise_for_status()
 
                     response.raise_for_status()
-                    return await response.json()
+                    json_data: dict[str, Any] = await response.json()
+                    return json_data
 
             except aiohttp.ClientResponseError as e:
                 if e.status == 429 and attempt < max_retries:
@@ -1008,7 +1009,7 @@ async def main():
         sse = SseServerTransport("/messages/")
 
         async def handle_sse(request: Request):
-            async with sse.connect_sse(request.scope, request.receive, request._send) as streams:  # type: ignore
+            async with sse.connect_sse(request.scope, request.receive, request._send) as streams:
                 initialization_options = server.create_initialization_options(
                     notification_options=NotificationOptions(tools_changed=True)
                 )

@@ -343,7 +343,7 @@ async def _handle_customer_discount(pricing_server, arguments: dict) -> list[Tex
     result = await pricing_server.get_customer_discount(**arguments)
 
     response_text = f"""Customer Discount Information
-    
+
 Customer ID: {result['customer_id']}
 Discount Type: {result['discount_type']}
 Discount Percentage: {result['discount_percentage']}%

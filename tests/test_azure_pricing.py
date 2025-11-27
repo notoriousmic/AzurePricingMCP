@@ -504,7 +504,7 @@ class TestServiceNameMappings:
         with patch.object(pricing_server, "search_azure_prices") as mock_search:
             mock_search.return_value = {"items": [{"serviceName": "Azure App Service"}], "count": 1}
 
-            result = await pricing_server.search_azure_prices_with_fuzzy_matching(service_name="app service")
+            await pricing_server.search_azure_prices_with_fuzzy_matching(service_name="app service")
 
             # Should use the mapping to search for correct service
             assert mock_search.called
@@ -515,7 +515,7 @@ class TestServiceNameMappings:
         with patch.object(pricing_server, "search_azure_prices") as mock_search:
             mock_search.return_value = {"items": [{"serviceName": "Virtual Machines"}], "count": 1}
 
-            result = await pricing_server.search_azure_prices_with_fuzzy_matching(service_name="vm")
+            await pricing_server.search_azure_prices_with_fuzzy_matching(service_name="vm")
 
             assert mock_search.called
 
@@ -526,9 +526,9 @@ class TestErrorHandling:
     @pytest.mark.asyncio
     async def test_handle_price_search_error(self, pricing_server):
         """Test error handling in price search."""
-        with patch.object(pricing_server, "search_azure_prices", side_effect=Exception("API Error")):
+        with patch.object(pricing_server, "search_azure_prices", side_effect=ValueError("API Error")):
             # This would normally be caught by the handler wrapper
-            with pytest.raises(Exception):
+            with pytest.raises(ValueError):
                 await pricing_server.search_azure_prices(service_name="Test")
 
     @pytest.mark.asyncio
