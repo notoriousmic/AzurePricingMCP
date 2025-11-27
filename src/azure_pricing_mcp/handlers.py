@@ -216,8 +216,8 @@ Showing top: {result['showing_top']}
 
     # Build recommendations table
     response_text += "\n📋 Ranked Recommendations:\n\n"
-    response_text += "| Rank | Region | Location | Price | Savings vs Max |\n"
-    response_text += "|------|--------|----------|-------|----------------|\n"
+    response_text += "| Rank | Region | Location | Price | Type | Savings vs Max |\n"
+    response_text += "|------|--------|----------|-------|------|----------------|\n"
 
     for i, rec in enumerate(recommendations, 1):
         region = rec.get("region", "N/A")
@@ -225,11 +225,14 @@ Showing top: {result['showing_top']}
         price = rec.get("retail_price", 0)
         savings = rec.get("savings_vs_most_expensive", 0)
         unit = rec.get("unit_of_measure", "")
+        pricing_type = rec.get("pricing_type", "On-Demand")
 
         # Add medal emoji for top 3
         rank_display = {1: "🥇 1", 2: "🥈 2", 3: "🥉 3"}.get(i, str(i))
 
-        response_text += f"| {rank_display} | {region} | {location} | ${price:.6f}/{unit} | {savings:.1f}% |\n"
+        response_text += (
+            f"| {rank_display} | {region} | {location} | ${price:.6f}/{unit} | {pricing_type} | {savings:.1f}% |\n"
+        )
 
     # Add original prices if discount was applied
     if "discount_applied" in result and recommendations and "original_price" in recommendations[0]:

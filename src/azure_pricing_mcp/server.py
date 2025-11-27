@@ -535,16 +535,38 @@ class AzurePricingServer:
             }
 
         # Extract unique regions with non-zero prices
+        # Prioritize on-demand pricing over Spot/Low Priority
         region_data: dict[str, dict[str, Any]] = {}
         for item in discovery_result["items"]:
             region = item.get("armRegionName")
             price = item.get("retailPrice", 0)
             location = item.get("location", region)
+            sku_name_item = item.get("skuName", "")
+            meter_name = item.get("meterName", "")
+
+            # Determine pricing type from SKU/meter name
+            is_spot = "Spot" in sku_name_item or "Spot" in meter_name
+            is_low_priority = "Low Priority" in sku_name_item or "Low Priority" in meter_name
+            pricing_type = "Spot" if is_spot else ("Low Priority" if is_low_priority else "On-Demand")
 
             # Filter out items with $0 prices (preview/unavailable)
             if region and price and price > 0:
-                # Keep the lowest price for each region (in case of multiple entries)
-                if region not in region_data or price < region_data[region]["retail_price"]:
+                # Prioritize On-Demand over Spot/Low Priority
+                # Only replace if: region not seen yet, OR current is On-Demand and existing is not,
+                # OR same pricing type and lower price
+                existing = region_data.get(region)
+                should_replace = False
+
+                if existing is None:
+                    should_replace = True
+                elif pricing_type == "On-Demand" and existing.get("pricing_type") != "On-Demand":
+                    # On-Demand always takes priority over Spot/Low Priority
+                    should_replace = True
+                elif pricing_type == existing.get("pricing_type") and price < existing["retail_price"]:
+                    # Same pricing type, keep lower price
+                    should_replace = True
+
+                if should_replace:
                     region_data[region] = {
                         "region": region,
                         "location": location,
@@ -553,6 +575,7 @@ class AzurePricingServer:
                         "product_name": item.get("productName"),
                         "unit_of_measure": item.get("unitOfMeasure"),
                         "meter_name": item.get("meterName"),
+                        "pricing_type": pricing_type,
                     }
 
         if not region_data:
