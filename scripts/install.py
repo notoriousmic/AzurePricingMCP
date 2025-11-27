@@ -4,9 +4,9 @@ Installation and setup script for Azure Pricing MCP Server
 This script sets up the virtual environment and installs the package in development mode.
 """
 
+import os
 import subprocess
 import sys
-import os
 from pathlib import Path
 
 

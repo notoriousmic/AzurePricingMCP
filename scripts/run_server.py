@@ -4,9 +4,9 @@ Run the Azure Pricing MCP Server
 Quick script to run the server after installation
 """
 
+import os
 import subprocess
 import sys
-import os
 from pathlib import Path
 
 

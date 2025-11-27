@@ -4,7 +4,8 @@ Setup script for Azure Pricing MCP Server
 """
 
 from pathlib import Path
-from setuptools import setup, find_packages
+
+from setuptools import find_packages, setup
 
 # Read the README for long description
 readme_file = Path(__file__).parent / "README.md"

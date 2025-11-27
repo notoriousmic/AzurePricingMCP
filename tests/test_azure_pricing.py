@@ -6,14 +6,12 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from mcp.types import TextContent
 
-from azure_pricing_mcp.handlers import (
-    _handle_cost_estimate,
-    _handle_customer_discount,
-    _handle_discover_skus,
-    _handle_price_compare,
-    _handle_price_search,
-    _handle_sku_discovery,
-)
+from azure_pricing_mcp.handlers import (_handle_cost_estimate,
+                                        _handle_customer_discount,
+                                        _handle_discover_skus,
+                                        _handle_price_compare,
+                                        _handle_price_search,
+                                        _handle_sku_discovery)
 from azure_pricing_mcp.server import AzurePricingServer
 
 

@@ -4,9 +4,10 @@ Health check script for Azure Pricing MCP Server Docker container
 Verifies the server can start and respond to basic queries
 """
 
-import sys
 import asyncio
 import json
+import sys
+
 from azure_pricing_mcp.server import AzurePricingServer
 
 

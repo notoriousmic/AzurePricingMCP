@@ -7,9 +7,11 @@ import sys
 
 sys.path.append(".")
 
-from azure_pricing_mcp.server import AzurePricingServer
-from mcp.types import TextContent
 import logging
+
+from mcp.types import TextContent
+
+from azure_pricing_mcp.server import AzurePricingServer
 
 # Enable debug logging
 logging.basicConfig(level=logging.DEBUG)

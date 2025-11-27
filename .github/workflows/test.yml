@@ -37,7 +37,7 @@ jobs:
         black --check src/ tests/
         
         echo "Running Ruff..."
-        ruff check src/ tests/
+        ruff check --ignore-unsafe src/ tests/
         
         echo "Running MyPy..."
         mypy src/

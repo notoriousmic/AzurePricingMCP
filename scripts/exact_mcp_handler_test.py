@@ -7,8 +7,9 @@ import sys
 
 sys.path.append(".")
 
-from azure_pricing_mcp.server import AzurePricingServer
 from mcp.types import TextContent
+
+from azure_pricing_mcp.server import AzurePricingServer
 
 
 async def test_exact_handler():

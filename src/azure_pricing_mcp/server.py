@@ -12,9 +12,7 @@ from typing import Any
 import aiohttp
 from mcp.server import NotificationOptions, Server
 from mcp.server.stdio import stdio_server
-from mcp.types import (
-    Tool,
-)
+from mcp.types import Tool
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
