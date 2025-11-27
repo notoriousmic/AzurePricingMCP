@@ -215,9 +215,9 @@ Showing top: {result['showing_top']}
 """
 
     # Build recommendations table
-    response_text += "\n📋 Ranked Recommendations:\n\n"
-    response_text += "| Rank | Region | Location | Price | Type | Savings vs Max |\n"
-    response_text += "|------|--------|----------|-------|------|----------------|\n"
+    response_text += "\n📋 Ranked Recommendations (On-Demand Pricing):\n\n"
+    response_text += "| Rank | Region | Location | On-Demand Price | Spot Price | Savings vs Max |\n"
+    response_text += "|------|--------|----------|-----------------|------------|----------------|\n"
 
     for i, rec in enumerate(recommendations, 1):
         region = rec.get("region", "N/A")
@@ -225,14 +225,31 @@ Showing top: {result['showing_top']}
         price = rec.get("retail_price", 0)
         savings = rec.get("savings_vs_most_expensive", 0)
         unit = rec.get("unit_of_measure", "")
-        pricing_type = rec.get("pricing_type", "On-Demand")
+        spot_price = rec.get("spot_price")
 
         # Add medal emoji for top 3
         rank_display = {1: "🥇 1", 2: "🥈 2", 3: "🥉 3"}.get(i, str(i))
 
+        # Format spot price column
+        spot_display = f"${spot_price:.6f}" if spot_price else "N/A"
+
         response_text += (
-            f"| {rank_display} | {region} | {location} | ${price:.6f}/{unit} | {pricing_type} | {savings:.1f}% |\n"
+            f"| {rank_display} | {region} | {location} | ${price:.6f}/{unit} | {spot_display} | {savings:.1f}% |\n"
         )
+
+    # Add Spot pricing note if any recommendations have spot pricing
+    spot_available = [rec for rec in recommendations if rec.get("spot_price")]
+    if spot_available:
+        response_text += "\n💡 **Spot Pricing Available:**\n"
+        for rec in spot_available[:5]:  # Show top 5 with spot pricing
+            location = rec.get("location", "N/A")
+            spot_price = rec.get("spot_price", 0)
+            on_demand = rec.get("retail_price", 0)
+            spot_savings = ((on_demand - spot_price) / on_demand * 100) if on_demand > 0 else 0
+            response_text += (
+                f"   • {location}: Spot @ ${spot_price:.4f}/hr ({spot_savings:.0f}% cheaper than On-Demand)\n"
+            )
+        response_text += "   ⚠️ Note: Spot VMs can be evicted when Azure needs capacity\n"
 
     # Add original prices if discount was applied
     if "discount_applied" in result and recommendations and "original_price" in recommendations[0]:

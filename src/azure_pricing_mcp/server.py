@@ -535,8 +535,10 @@ class AzurePricingServer:
             }
 
         # Extract unique regions with non-zero prices
-        # Prioritize on-demand pricing over Spot/Low Priority
+        # Track both On-Demand and Spot pricing separately per region
         region_data: dict[str, dict[str, Any]] = {}
+        spot_data: dict[str, dict[str, Any]] = {}  # Track Spot pricing separately
+
         for item in discovery_result["items"]:
             region = item.get("armRegionName")
             price = item.get("retailPrice", 0)
@@ -547,36 +549,35 @@ class AzurePricingServer:
             # Determine pricing type from SKU/meter name
             is_spot = "Spot" in sku_name_item or "Spot" in meter_name
             is_low_priority = "Low Priority" in sku_name_item or "Low Priority" in meter_name
-            pricing_type = "Spot" if is_spot else ("Low Priority" if is_low_priority else "On-Demand")
 
             # Filter out items with $0 prices (preview/unavailable)
             if region and price and price > 0:
-                # Prioritize On-Demand over Spot/Low Priority
-                # Only replace if: region not seen yet, OR current is On-Demand and existing is not,
-                # OR same pricing type and lower price
-                existing = region_data.get(region)
-                should_replace = False
+                item_data = {
+                    "region": region,
+                    "location": location,
+                    "retail_price": price,
+                    "sku_name": item.get("skuName"),
+                    "product_name": item.get("productName"),
+                    "unit_of_measure": item.get("unitOfMeasure"),
+                    "meter_name": item.get("meterName"),
+                }
 
-                if existing is None:
-                    should_replace = True
-                elif pricing_type == "On-Demand" and existing.get("pricing_type") != "On-Demand":
-                    # On-Demand always takes priority over Spot/Low Priority
-                    should_replace = True
-                elif pricing_type == existing.get("pricing_type") and price < existing["retail_price"]:
-                    # Same pricing type, keep lower price
-                    should_replace = True
+                if is_spot or is_low_priority:
+                    # Track Spot/Low Priority pricing separately
+                    pricing_type = "Spot" if is_spot else "Low Priority"
+                    if region not in spot_data or price < spot_data[region]["retail_price"]:
+                        spot_data[region] = {**item_data, "pricing_type": pricing_type}
+                else:
+                    # On-Demand pricing
+                    if region not in region_data or price < region_data[region]["retail_price"]:
+                        region_data[region] = {**item_data, "pricing_type": "On-Demand"}
 
-                if should_replace:
-                    region_data[region] = {
-                        "region": region,
-                        "location": location,
-                        "retail_price": price,
-                        "sku_name": item.get("skuName"),
-                        "product_name": item.get("productName"),
-                        "unit_of_measure": item.get("unitOfMeasure"),
-                        "meter_name": item.get("meterName"),
-                        "pricing_type": pricing_type,
-                    }
+        # Merge Spot pricing info into On-Demand entries
+        for region, on_demand in region_data.items():
+            if region in spot_data:
+                spot = spot_data[region]
+                on_demand["spot_price"] = spot["retail_price"]
+                on_demand["spot_sku_name"] = spot["sku_name"]
 
         if not region_data:
             return {
