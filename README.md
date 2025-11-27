@@ -414,7 +414,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Original Author**: [@charris-msft](https://github.com/charris-msft)
 - **Current Maintainer + Version 2.0**: [@msftnadavbh](https://github.com/msftnadavbh)
 - **Contributors**: 
-  - Michael Liav - Testing infrastructure and best practices
+  - [@notoriousmic](https://github.com/notoriousmic) - Testing infrastructure and best practices
 - [Model Context Protocol](https://modelcontextprotocol.io/) - The protocol that makes this possible
 - [Azure Retail Prices API](https://learn.microsoft.com/en-us/rest/api/cost-management/retail-prices/azure-retail-prices) - Microsoft's public pricing API
 - All open-source contributors
